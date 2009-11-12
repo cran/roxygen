@@ -15,7 +15,8 @@ register.preref.parsers(parse.value,
                         'import',
                         'importFrom',
                         'importClassesFrom',
-                        'importMethodsFrom')
+                        'importMethodsFrom',
+                        'useDynLib')
 
 #' Make a namespace roclet which parses the given files and writes a list of
 #' namespace directives to a given file or standard out; see
@@ -84,10 +85,27 @@ register.preref.parsers(parse.value,
 #' importMethodsFrom export
 make.namespace.roclet <- function(outfile='',
                                   verbose=TRUE) {
-  parse.directive <- function(proc, parms)
-    cat(sprintf('%s(%s)\n', proc, strmap(Identity, ', ', parms)),
-        file=outfile,
-        append=TRUE)
+
+  namespace <- list()
+
+  namespace.reset <- function()
+    namespace <<- list()
+  
+  namespace.exists <- function(proc, parms)
+    parms %in% namespace[[proc]]
+
+  namespace.register <- function(proc, parms)
+    namespace[[proc]] <<- append(namespace[[proc]], parms)
+  
+  parse.directive <- function(proc, parms) {
+    parms <- strmap(Identity, ', ', parms)
+    if ( !namespace.exists(proc, parms) ) {
+      cat(sprintf('%s(%s)\n', proc, parms),
+          file=outfile,
+          append=TRUE)
+      namespace.register(proc, parms)
+    }
+  }
   
   exportee <- NULL
 
@@ -102,6 +120,7 @@ make.namespace.roclet <- function(outfile='',
     if (verbose && !is.null.string(outfile))
       cat(sprintf('Writing namespace directives to %s', outfile), '\n')
     unlink(outfile)
+    namespace.reset()
   }
 
   roclet <- make.roclet(parse.directive,
@@ -148,7 +167,8 @@ make.namespace.roclet <- function(outfile='',
                                   'import',
                                   'importFrom',
                                   'importClassesFrom',
-                                  'importMethodsFrom')
+                                  'importMethodsFrom',
+                                  'useDynLib')
 
   roclet
 }

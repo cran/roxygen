@@ -33,8 +33,10 @@ trim <- function(string)
 #' Does the string contain no matter, but very well [:space:]?
 #' @param string the string to check
 #' @return TRUE if the string contains words, otherwise FALSE
-is.null.string <- function(string)
-  regexpr(MATTER, string) < 0
+is.null.string <- function(string) {
+  if (is.na(string)) FALSE
+  else regexpr(MATTER, string) < 0
+}
 
 #' Number of words a string contains.
 #' @param string the string whose words to count
@@ -159,4 +161,14 @@ substr.regexpr <- function(pattern, text) {
     end <- car(attr(matches, 'match.length'))
     substr(text, start, end)
   }
+}
+
+#' Quote characters and return all other types untouched.
+#' @param x the value to maybe quote
+#' @return The quoted character or the untouched value
+maybe.quote <- function(x) {
+  if (is.character(x))
+    sprintf('"%s"', x)
+  else
+    x
 }

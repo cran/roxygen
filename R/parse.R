@@ -2,6 +2,7 @@
 #' @include functional.R
 #' @include string.R
 #' @include list.R
+#' @include memoize.R
 roxygen()
 
 #' Sequence that distinguishes roxygen comment from normal comment.
@@ -80,7 +81,7 @@ register.parsers <- function(table, parser, ...) {
   for (key in c(...))
     register.parser(table, key, parser)
 }
-  
+
 #' Register many preref parsers at once.
 #' @param parser the parser to register
 #' @param \dots the keys upon which to register
@@ -170,7 +171,7 @@ parse.value <- function(key, rest) {
   else
     parse.default(key, rest)
 }
-  
+
 #' Parse an element containing a mandatory name
 #' and description (such as \code{@@param}).
 #' @param key the parsing key
@@ -300,29 +301,33 @@ parse.ref.preref <- function(ref, ...) {
                               if (is.null.string(description)) NULL
                               else parse.description(description))
   }
-} 
+}
 
 #' Recursively walk an expression (as returned by \code{parse}) in
 #' preorder.
 #' @param proc the procedure to apply to each subexpression
 #' @param expression the root of the expression
 #' @return NULL
+#' @export
 preorder.walk.expression <- function(proc, expression) {
-  if (length(expression) > 0)
+  if (length(expression) > 0) {
+    names <- names(expression)
     for (i in c(1:length(expression))) {
       member <- tryCatch(expression[[i]], error=function(e) NULL)
       if (!is.null(member) && !identical(member, expression)) {
-        proc(member)
+        proc(structure(list(member), names=names[i]))
         try(preorder.walk.expression(proc, member),
             silent=TRUE)
       }
     }
+  }
 }
 
 #' Flatten a nested expression into a list, preorderly.
 #' @param expression the root of the expression to be
 #' flattened
 #' @return A list containing the flattened expression
+#' @export
 preorder.flatten.expression <- function(expression) {
   flattened <- NULL
   preorder.walk.expression(function(expression)
@@ -366,7 +371,7 @@ parse.formals <- function(expressions) {
   else list(formals=Map(function(formal)
               if (is.null(formal)) ''
               else if (is.call(formal)) capture.output(formal)
-              else as.character(formal), formals))
+              else as.character(maybe.quote(formal)), formals))
 }
 
 #' Find the assignee of the expression
@@ -394,13 +399,16 @@ parse.call <- function(expressions) {
   }
 }
 
-#' Parse a srcref
+#' Parse a srcref;
+#' with the help of memoization (by Hadley Wickham).
+#' param ref the srcref to be parsed
+#' param \dots ignored
 #' @method parse.ref srcref
-#' @param ref the srcref to be parsed
+#' @param ... the srcref to be parsed
 #' @param \dots ignored
 #' @return List containing the parsed srcref
 #' @export
-parse.ref.srcref <- function(ref, ...) {
+parse.ref.srcref <- memoize(function(ref, ...) {
   srcfile <- attributes(ref)$srcfile
   srcref <- list(srcref=list(filename=srcfile$filename,
                    lloc=as.vector(ref)))
@@ -410,7 +418,7 @@ parse.ref.srcref <- function(ref, ...) {
   if (is.call(car(expressions)))
     parsed <- parse.call(expressions)
   append(parsed, srcref)
-}
+})
 
 #' Parse each of a list of preref/srcref pairs.
 #' @param preref.srcrefs list of preref/srcref pairs
@@ -418,7 +426,8 @@ parse.ref.srcref <- function(ref, ...) {
 parse.refs <- function(preref.srcrefs)
   Map(parse.ref, preref.srcrefs)
 
-#' Parse a source file containing roxygen directives.
+#' Parse a source file containing roxygen directives;
+#' with the help of memoization (by Hadley Wickham).
 #' @param file string naming file to be parsed
 #' @return List containing parsed directives
 #' @export
@@ -426,6 +435,18 @@ parse.refs <- function(preref.srcrefs)
 #' @callGraphDepth 3
 parse.file <- function(file) {
   srcfile <- srcfile(file)
+  cached.parse.srcfile(srcfile)
+}
+
+#' Memoized parse.srcfile (by Hadley Wickham).
+#' @param ... the srcfile object
+#' @return List containing parsed directives
+cached.parse.srcfile <- memoize(parse.srcfile)
+
+#' Parse a srcfile object.
+#' @param srcfile the srcfile object
+#' @return List containing parsed directives
+parse.srcfile <- function(srcfile) {
   srcrefs <- attributes(parse(srcfile$filename,
                               srcfile=srcfile))$srcref
   if (length(srcrefs) > 0)

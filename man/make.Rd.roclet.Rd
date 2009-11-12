@@ -16,6 +16,7 @@ Roxygen tag \tab Rd analogue\cr
 \code{@concept} \tab \code{\\concept}\cr
 \code{@example} \tab \emph{n/a}\cr
 \code{@examples} \tab \code{\\examples}\cr
+\code{@format} \tab \code{\\format}\cr
 \code{@keywords} \tab \code{\\keyword, ...}\cr
 \code{@method} \tab \code{\\method}\cr
 \code{@name} \tab \code{\\name}\cr
@@ -24,6 +25,7 @@ Roxygen tag \tab Rd analogue\cr
 \code{@references} \tab \code{\\references}\cr
 \code{@return} \tab \code{\\value}\cr
 \code{@seealso} \tab \code{\\seealso}\cr
+\code{@source} \tab \code{\\source}\cr
 \code{@title} \tab \code{\\title}\cr
 \code{@TODO} \tab \emph{n/a}\cr
 \code{@usage} \tab \code{\\usage}\cr
@@ -34,7 +36,7 @@ Roxygen tag \tab Rd analogue\cr
 \cite{Writing R Extensions}.}
 \item{\code{@aliases}}{A default alias is plucked from the \code{@name} or
 assignee; otherwise, \code{@alias a b ...} translates
-to \code{\alias{a}}, \code{\alias{b}}, &c.
+to \code{\\alias{a}}, \code{\\alias{b}}, &c.
 If you specify one alias, however, specify them all.}
 \item{\code{@concept}}{See \dQuote{2.8 Indices} from
 \cite{Writing R Extensions}.}
@@ -43,12 +45,14 @@ relative to the package head; if the file resides in
 \file{tests}, for instance, it will be checked with
 \command{R CMD check}.
 The contents of the file will
-be concatenated under \code{\examples{...}}.}
+be concatenated under \code{\\examples{...}}.}
 \item{\code{@examples}}{Verbatim examples; see \dQuote{2.1.1
 Documenting functions} from \cite{Writing R
 Extensions}.}
+\item{\code{@format}}{See \dQuote{2.1.2 Documenting data sets} from
+\cite{Writing R Extensions}.}
 \item{\code{@keywords}}{\code{@keywords a b ...} translates to
-\code{\keyword{a}}, \code{\keyword{b}}, &c.}
+\code{\\keyword{a}}, \code{\\keyword{b}}, &c.}
 \item{\code{@method}}{Use \code{@method <generic> <class>} to document
 S3 functions.}
 \item{\code{@name}}{In the absense of an explicit \code{@name} tag, the
@@ -61,6 +65,8 @@ name of an assignment is plucked from the assignee.}
 \cite{Writing R Extensions}.}
 \item{\code{@return}}{The return value of the function, or \code{NULL}.}
 \item{\code{@seealso}}{See \dQuote{2.1.1 Documenting functions} from
+\cite{Writing R Extensions}.}
+\item{\code{@source}}{See \dQuote{2.1.2 Documenting data sets} from
 \cite{Writing R Extensions}.}
 \item{\code{@title}}{A default title is plucked from the first sentence
 of the description; that is, the first phrase ending
@@ -87,13 +93,9 @@ of multiple functions in one Rd unit).}
 \alias{keywords}
 \alias{return}
 \alias{author}
-\alias{TODO}
-\alias{param}
-\alias{method}
-\alias{setClass}
-\alias{setGeneric}
-\alias{setMethod}
 \alias{make.Rd.roclet}
+\section{TODO}{param method setClass setGeneric setMethod
+make.Rd.roclet}
 \arguments{\item{subdir}{directory into which to place the Rd files; if
 \code{NULL}, standard out.}
 \item{verbose}{whether to declare what we're doing in the

@@ -2,5 +2,5 @@
 \contentsline {section}{\numberline {2}Example: Pseudoprimality}{3}
 \contentsline {subsection}{\numberline {2.1}Package Description}{3}
 \contentsline {subsection}{\numberline {2.2}Fermat Test}{4}
-\contentsline {subsection}{\numberline {2.3}Pseudoprime}{6}
+\contentsline {subsection}{\numberline {2.3}Pseudoprime}{5}
 \contentsline {subsection}{\numberline {2.4}Running \texttt {Roxygen}{}}{6}
