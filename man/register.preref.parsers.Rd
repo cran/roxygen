@@ -1,5 +1,6 @@
 \name{register.preref.parsers}
 \alias{register.preref.parsers}
+\alias{register.srcref.parsers}
 \title{Register many preref parsers at once.}
 \description{Register many preref parsers at once.}
 \value{\code{NULL}}

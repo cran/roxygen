@@ -1,5 +1,6 @@
 \name{register.preref.parser}
 \alias{register.preref.parser}
+\alias{register.srcref.parser}
 \title{Specifically register a preref parser...}
 \description{Specifically register a preref parser}
 \value{\code{NULL}}

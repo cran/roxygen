@@ -8,53 +8,6 @@
 #' @include Rdmerge.R
 roxygen()
 
-register.preref.parsers(parse.default,
-                        'nord')
-
-register.preref.parsers(parse.value,
-                        'name',
-                        'aliases',
-                        'title',
-                        'usage',
-                        'references',
-                        'concept',
-                        'note',
-                        'seealso',
-                        'example',
-                        'examples',
-                        'keywords',
-                        'return',
-                        'author',
-                        'TODO',
-                        'format',
-                        'source',
-                        'rdname')
-
-register.preref.parsers(parse.name.description,
-                        'param',
-                        'method',
-                        'slot')
-
-register.preref.parsers(parse.name,
-                        'docType')
-
-register.srcref.parser('setClass',
-                       function(pivot, expression)
-                       list(S4class=car(expression),
-                            S4formals=parseS4.class(cdr(expression))))
-
-register.srcref.parser('setGeneric',
-                       function(pivot, expression)
-                       list(S4generic=car(expression)))
-
-register.srcref.parser('setMethod',
-                       function(pivot, expression) {
-                         S4formals <- parseS4.method(cdr(expression))
-                         list(S4method=car(expression),
-                              S4formals=S4formals,
-                              formals=S4formals$definition)
-                       })
-
 #' New implementation of the Rd roclet; same functionality as the original
 #' implementation plus basic S4 handling.
 #'
@@ -84,6 +37,53 @@ make.Rd2.roclet <- function(subdir=NULL,
                             exportonly=FALSE,
                             documentedonly=TRUE) {
 
+  register.preref.parsers(parse.default,
+                          'nord')
+
+  register.preref.parsers(parse.value,
+                          'name',
+                          'aliases',
+                          'title',
+                          'usage',
+                          'references',
+                          'concept',
+                          'note',
+                          'seealso',
+                          'example',
+                          'examples',
+                          'keywords',
+                          'return',
+                          'author',
+                          'TODO',
+                          'format',
+                          'source',
+                          'rdname')
+
+  register.preref.parsers(parse.name.description,
+                          'param',
+                          'method',
+                          'slot')
+
+  register.preref.parsers(parse.name,
+                          'docType')
+
+  register.srcref.parser('setClass',
+                         function(pivot, expression)
+                         list(S4class=car(expression),
+                              S4formals=parseS4.class(cdr(expression))))
+
+  register.srcref.parser('setGeneric',
+                         function(pivot, expression)
+                         list(S4generic=car(expression)))
+
+  register.srcref.parser('setMethod',
+                         function(pivot, expression) {
+                           S4formals <- parseS4.method(cdr(expression))
+                           list(S4method=car(expression),
+                                S4formals=S4formals,
+                                formals=S4formals$definition)
+                         })
+
   require(tools)
   
   rdtank <- make.Rdtank()
@@ -109,7 +109,7 @@ make.Rd2.roclet <- function(subdir=NULL,
 
     if ( verbose )
       if ( saveRd )
-        cat(sprintf(' witten to %s', filename))
+        cat(sprintf(' written to %s', filename))
       else
         cat(' omitted')
   }
@@ -245,7 +245,9 @@ make.Rd2.roclet <- function(subdir=NULL,
       
       if (!is.null(subdir)) {
         assign.parent('filename',
-                      file.path(subdir, sprintf('%s.Rd', basename)),
+                      file.path(subdir,
+                                sprintf('%s.Rd',
+                                        translate.questionable.characters(basename))),
                       environment())
         if (verbose)
           cat(sprintf('Processing %s:', name))
@@ -288,6 +290,10 @@ make.Rd2.roclet <- function(subdir=NULL,
         do.call(paste, c(Map(function(name.default) {
           name <- car(name.default)
           default <- cadr(name.default)
+          default <- gsubfn("\"(.*)\"",
+                            function(x)
+                            sprintf("\"%s\"", gsub("\"", "\\\\\"", x)),
+                            as.character(default))
           if (is.null.string(default))
             name
           else

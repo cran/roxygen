@@ -1,7 +1,9 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage{fancyvrb}
+\usepackage[pdfborder={0 0 0}]{hyperref}
 \usepackage{url}
+\usepackage{upquote}
 \usepackage{graphicx}
 \usepackage{grffile}
 \usepackage{float}
@@ -45,19 +47,25 @@
 \texttt{hello-roxygen.R} (fig. \ref{hello-roxygen}) is a minimal
 example to check the sanity of your \Roxygen{} installation. It merely
 replaces the package description so that `\texttt{R CMD check}' will
-run after \Roxygen{} has processed the package skeleton:
+run after \Roxygen{} has processed the package skeleton.
 
-<<keep.source=true>>=
+First, create the package skeleton:
+<<keep.source=true,eval=FALSE>>=
 library(roxygen)
 package.skeleton('helloRoxygen',
                  code_files='hello-roxygen.R',
                  force=TRUE)
-# `R CMD roxygen -d helloRoxygen' works, too.
+@ 
+then, run \Roxygen{} on the new directory:
+<<eval=FALSE>>=
 roxygenize('helloRoxygen',
            roxygen.dir='helloRoxygen',
            copy.package=FALSE,
            unlink.target=FALSE)
 @
+%%\begin{quote}
+%%  \texttt{R CMD roxygen -d helloRoxygen}.
+%%\end{quote}
 
 A new \texttt{helloRoxygen/man/helloRoxygen-package.Rd} should have
 been created with the contents of figure \ref{hello-roxygen}; and
@@ -75,7 +83,7 @@ been created with the contents of figure \ref{hello-roxygen}; and
 One could imagine, for instance, a less trivial package that actually
 does something; enter \texttt{pseudoprime}, a toy that tests for
 primes using Fermat's little
-theorem.\footnote{\url{http://en.wikipedia.org/wiki/Fermat's_little_theorem}}
+theorem.\footnote{\href{http://en.wikipedia.org/wiki/Fermat\%27s_little_theorem}{http://en.wikipedia.org/wiki/Fermat\textquotesingle s\_little\_theorem}}
 
 A package description has been provided in figure
 \ref{pseudoprime-package}; notice the \texttt{roxygen()} statement in
@@ -110,7 +118,7 @@ details. \citep[\S2.3 ``Marking text'']{r-core}
         {Roxygen example \texttt{fermat.R}}
         {fermat}
 
-<<echo=false, results=hide>>=
+<<echo=false, results=hide, eval=FALSE>>=
 roxygenize('pseudoprime',
            roxygen.dir='pseudoprime',
            copy.package=FALSE,
@@ -126,17 +134,17 @@ must be documented with \texttt{@return <description>} (lines 9-10).
 Notice \texttt{@callGraphPrimitives} (line 11): it creates a call
 graph at the default depth similar to figure \ref{fermat-test},
 including primitive functions; \texttt{@callGraph}, on the other hand,
-would exclude primitive functions. Note that this roclet requires
-package {\tt Rgraphviz} $\geq 1.19.2$, and with {\tt Roxygen} $0.1-1$
-the {\tt callgraph} roclet is not automatically executed anymore; see
-help for function {\tt make.callgraph.roclet}\ref{running}.
+would exclude primitive functions.\footnote{Note that this feature requires
+package {\tt Rgraphviz} $\geq 1.19.2$, and as of {\tt Roxygen} $0.1-1$
+the {\tt callgraph} feature is not automatically executed; see
+help for {\tt make.callgraph.roclet}.}
 
-%\begin{figure}[H]
-%  \centering
-%  \includegraphics{pseudoprime/inst/doc/fermat.test-callgraph.pdf}
-%  \caption{\texttt{fermat.test} call graph with primitives}
-%  \label{fermat-test}
-%\end{figure}
+\begin{figure}[H]
+ \centering
+ \includegraphics{pseudoprime/inst/doc/fermat.test-callgraph.pdf}
+ \caption{\texttt{fermat.test} call graph with primitives}
+ \label{fermat-test}
+\end{figure}
 
 \subsection{Pseudoprime}
 
@@ -148,7 +156,7 @@ help for function {\tt make.callgraph.roclet}\ref{running}.
 Notice the header in \texttt{pseudoprime.R} (fig. \ref{pseudoprime})
 terminated by \texttt{roxygen()}; \texttt{@include fermat.R} (line 1)
 signals that \texttt{fermat.R} should be loaded before
-\texttt{pseudoprime.R}.  The collate roclet will update
+\texttt{pseudoprime.R}.  \Roxygen{} will update
 \texttt{DESCRIPTION} accordingly.
 
 \texttt{@export} (line 15) signifies that \texttt{is.pseudoprime} will
@@ -160,7 +168,7 @@ Running \texttt{`R CMD roxygen -d pseudoprime'} populates \texttt{man}
 with Rd files, edits \texttt{DESCRIPTION} and \texttt{NAMESPACE}, and
 puts call graphs in \texttt{inst/doc}:
 
-<<echo=false>>=
+<<echo=false,eval=FALSE>>=
 roxygenize('pseudoprime',
            roxygen.dir='pseudoprime',
            copy.package=FALSE,
@@ -169,7 +177,8 @@ roxygenize('pseudoprime',
 @
 
 The \texttt{roxygenize} function is an alternative to \texttt{`R CMD
-  roxygen'}; see the help page for details.
+  roxygen'}; see the help page for details. Note that version 0.1-3 \texttt{`R CMD
+  roxygen'} is not available anymore.
 
 
 \bibliographystyle{plainnat}
